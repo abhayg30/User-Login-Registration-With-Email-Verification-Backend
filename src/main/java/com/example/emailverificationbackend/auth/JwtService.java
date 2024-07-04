@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,13 +14,16 @@ import java.util.Map;
 @Service
 public class JwtService {
 
-    public static final String SECRET = "Random generate secret key";
+    public static final String SECRET = "4261656C64756E674261656C64756E674261656C64756E67";
 
-    public void validateToken(final String token) {
-       Jwts.parser()
-               .verifyWith(getSignKey())
-               .build()
-               .parse(token);
+    public boolean validateToken(final String token) {
+
+        try{
+            Jwts.parser().verifyWith(getSignKey()).build().parse(token);
+            return true;
+        } catch (Exception ex){
+            return false;
+        }
     }
 
     public String generateToken(String userName, String id) {
@@ -39,6 +43,7 @@ public class JwtService {
     }
 
     private SecretKey getSignKey() {
-        return Jwts.SIG.HS256.key().build();
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }

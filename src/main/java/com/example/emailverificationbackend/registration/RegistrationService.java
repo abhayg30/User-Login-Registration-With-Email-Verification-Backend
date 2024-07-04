@@ -27,7 +27,7 @@ public class RegistrationService {
         String token =  appUserService.signUpUser(new AppUser(request.getFirstName() , request.getLastName() , request.getEmail()
         , request.getPassword() , AppUserRole.USER));
 
-    String link = "http://localhost:9300/api/v1/registration/confirm?token=" + token;
+    String link = "http://lb:api-gateway/auth/api/v1/registration/confirm?token=" + token;
         emailSender.send(
                 request.getEmail(),
                 buildEmail(request.getFirstName(), link));

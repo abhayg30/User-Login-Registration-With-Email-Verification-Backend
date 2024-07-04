@@ -7,6 +7,7 @@ import com.example.emailverificationbackend.appuser.LoginResponse;
 import com.example.emailverificationbackend.auth.AuthService;
 import com.example.emailverificationbackend.auth.JwtService;
 import lombok.AllArgsConstructor;
+import org.apache.http.auth.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -37,13 +38,13 @@ public class RegistrationController {
     @Autowired
     private AppUserRepository appUserRepository;
 
-    @PostMapping("api/v1/registration")
+    @PostMapping("/auth/api/v1/registration")
     @ResponseBody
     public String register(@RequestBody RegistrationRequest registrationRequest) {
         return registrationService.register(registrationRequest);
     }
 
-    @GetMapping(path = "api/v1/registration/confirm")
+    @GetMapping(path = "/auth/api/v1/registration/confirm")
     @ResponseBody
     public HttpStatus confirm(@RequestParam("token") String token) {
 
@@ -53,7 +54,7 @@ public class RegistrationController {
         return HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
-    @PostMapping("api/v1/login")
+    @PostMapping("/auth/api/v1/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequestDto loginRequestDto){
         Long id;
         try {
@@ -80,14 +81,16 @@ public class RegistrationController {
         return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
 
-    @GetMapping("api/v1/validate")
-    public String validateToken(@RequestParam("token") String token) {
+    @GetMapping("/auth/api/v1/validate")
+    public ResponseEntity<Object> validateToken(@RequestParam("token") String token) throws AuthenticationException {
         try {
-            authService.validateToken(token);
-        } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Invalid Token");
+            if(authService.validateToken(token)){
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            throw new AuthenticationException("Invalid Token");
         }
-        return "Token is valid";
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

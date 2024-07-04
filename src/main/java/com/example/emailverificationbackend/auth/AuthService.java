@@ -10,24 +10,14 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     @Autowired
-    private AppUserRepository accountRepo;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private JwtService jwtService;
-
-    public AppUser saveAccount(AppUser account) throws Exception {
-        account.setPassword(passwordEncoder.encode(account.getPassword()));
-        return accountRepo.save(account);
-    }
 
     public String generateToken(String username, String id) {
         return jwtService.generateToken(username, id);
     }
 
-    public void validateToken(String token) {
-        jwtService.validateToken(token);
+    public boolean validateToken(String token) {
+
+        return jwtService.validateToken(token);
     }
 }
